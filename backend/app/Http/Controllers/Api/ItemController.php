@@ -18,7 +18,7 @@ class ItemController extends Controller
 
         $items = Item::when($search, function ($query) use ($search) {
                 $query->where('kode_barang', 'like', "%{$search}%")
-                    ->orWhere('nama_barang', 'like', "%{$search}%");
+                      ->orWhere('nama_barang', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(10);
@@ -35,7 +35,25 @@ class ItemController extends Controller
      */
     public function store(ItemRequest $request)
     {
-        $item = Item::create($request->validated());
+        // Ambil kode barang terakhir
+        $lastItem = Item::orderBy('id', 'desc')->first();
+
+        if ($lastItem) {
+            $lastNumber = (int) substr($lastItem->kode_barang, 2);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        $kodeBarang = 'BG' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+        $item = Item::create([
+            'kode_barang'  => $kodeBarang,
+            'nama_barang'  => $request->nama_barang,
+            'satuan'       => $request->satuan,
+            'stock_awal'   => $request->stock_awal,
+            'harga_satuan' => $request->harga_satuan,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -55,18 +73,19 @@ class ItemController extends Controller
             'data' => $item,
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(ItemRequest $request, Item $item)
     {
-        $item->update($request->safe()->only([
-            'kode_barang',
-            'nama_barang',
-            'satuan',
-            'stock_awal',
-            'harga_satuan',
-        ]));
+        $item->update([
+            // 'kode_barang'  => $request->kode_barang,
+            'nama_barang'  => $request->nama_barang,
+            'satuan'       => $request->satuan,
+            'stock_awal'   => $request->stock_awal,
+            'harga_satuan' => $request->harga_satuan,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -84,7 +103,7 @@ class ItemController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Barang berhasil dihapus.'
+            'message' => 'Barang berhasil dihapus.',
         ]);
     }
 }

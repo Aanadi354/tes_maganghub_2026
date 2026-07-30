@@ -24,6 +24,10 @@
 
                 <div class="modal-body">
 
+                    <div v-if="errorMessage" class="alert alert-danger">
+                        {{ errorMessage }}
+                    </div>
+
                     <div class="mb-3">
 
                         <label>Barang</label>
@@ -42,7 +46,7 @@
                                 :key="barang.id"
                                 :value="barang.id"
                             >
-                                {{ barang.kode_barang }} - {{ barang.nama_barang }}
+                                {{ barang.kode_barang }} - {{ barang.nama_barang }} (Stok: {{ barang.stock_awal ?? 0 }})
                             </option>
 
                         </select>
@@ -62,14 +66,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>Jumlah</label>
+                        <label>Jumlah Barang Keluar</label>
 
                         <input
                             type="number"
                             class="form-control"
                             v-model.number="form.jumlah"
                         >
-
                     </div>
                     
                     <div class="mb-3">
@@ -120,10 +123,10 @@ import { getItems } from "@/services/itemService";
 const emit = defineEmits(["saved"]);
 
 const modalRef = ref();
-
 let modal = null;
 
 const daftarBarang = ref([]);
+const errorMessage = ref("");
 
 const form = reactive({
     item_id: "",
@@ -133,38 +136,27 @@ const form = reactive({
 });
 
 const resetForm = () => {
-
     form.item_id = "";
     form.tanggal_transaksi = "";
     form.jumlah = null;
     form.keterangan = "";
-
-}
+    errorMessage.value = "";
+};
 
 const loadBarang = async () => {
-
     try {
-
         const res = await getItems();
-
-        daftarBarang.value = res.data.data.data;
-
-    } catch (err) { 
-
+        daftarBarang.value = res.data?.data?.data ?? res.data?.data ?? [];
+    } catch (err) {
         console.log(err);
-
+        daftarBarang.value = [];
     }
-
 };
 
 const open = async () => {
-
     resetForm();
-
     await loadBarang();
-
     modal.show();
-
 };
 
 defineExpose({
@@ -172,26 +164,44 @@ defineExpose({
 });
 
 const save = async () => {
+    errorMessage.value = "";
+
+    if (!form.item_id) {
+        errorMessage.value = "Silakan pilih barang terlebih dahulu.";
+        return;
+    }
+
+    if (!form.jumlah || Number(form.jumlah) <= 0) {
+        errorMessage.value = "Jumlah barang keluar harus lebih dari 0.";
+        return;
+    }
+
+    const selectedBarang = daftarBarang.value.find((item) => item.id === Number(form.item_id));
+
+    if (!selectedBarang) {
+        errorMessage.value = "Barang tidak ditemukan.";
+        return;
+    }
+
+    const stokSaatIni = Number(selectedBarang.stock_awal ?? 0);
+
+    if (Number(form.jumlah) > stokSaatIni) {
+        errorMessage.value = `Stok ${selectedBarang.nama_barang} tidak mencukupi. Stok tersedia: ${stokSaatIni}`;
+        return;
+    }
 
     try {
-
         await createBarangKeluar(form);
 
         emit("saved");
-
         modal.hide();
-
     } catch (err) {
-
         console.log(err.response?.data);
-
+        errorMessage.value = "Gagal menyimpan transaksi barang keluar.";
     }
-
 };
 
 onMounted(() => {
-
     modal = new bootstrap.Modal(modalRef.value);
-
 });
 </script>

@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>Jumlah</label>
+                        <label>Jumlah Barang Masuk</label>
 
                         <input
                             type="number"

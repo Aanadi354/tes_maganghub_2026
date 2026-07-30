@@ -9,7 +9,9 @@ import ItemView from "@/views/items/ItemView.vue";
 
 import BarangMasuk from "@/views/transaksi/BarangMasuk.vue";
 import BarangKeluar from "@/views/transaksi/BarangKeluar.vue";
-import Laporan from "@/views/transaksi/Laporan.vue";
+// import Laporan from "@/views/transaksi/Laporan.vue";
+import LaporanStok from "@/views/laporan/LaporanStokView.vue";
+import LaporanTransaksi from "@/views/laporan/LaporanTransaksiView.vue";
 
 const routes = [
   {
@@ -53,9 +55,18 @@ const routes = [
         component: BarangKeluar,
       },
 
+      // {
+      //   path: "laporan",
+      //   component: Laporan,
+      // },
       {
-        path: "laporan",
-        component: Laporan,
+        path: "laporan/stok",
+        component: LaporanStok,
+      },
+
+      {
+        path: "laporan/transaksi",
+        component: LaporanTransaksi,
       },
     ],
   },
