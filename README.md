@@ -54,11 +54,24 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-### 6. Konfigurasi database
+### 6. Import database
 
-Buka file `.env`, kemudian ubah konfigurasi database sesuai database lokal Anda.
+1. Buat database baru di MySQL, misalnya **tes_maganghub**.
+2. Import file SQL yang telah disediakan pada folder:
 
-Contoh:
+```text
+backend/database/tes_maganghub.sql
+```
+
+Anda dapat mengimpor file tersebut melalui **phpMyAdmin**, **MySQL Workbench**, atau menggunakan perintah:
+
+```bash
+mysql -u root -p tes_maganghub < backend/database/tes_maganghub.sql
+```
+
+### 7. Konfigurasi database
+
+Buka file `.env`, kemudian sesuaikan konfigurasi database.
 
 ```env
 DB_CONNECTION=mysql
@@ -69,15 +82,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Pastikan database **tes_maganghub** sudah dibuat terlebih dahulu di MySQL.
-
-### 7. Jalankan migration dan seeder
-
-```bash
-php artisan migrate --seed
-```
-
-Seeder akan membuat akun administrator secara otomatis.
+> **Catatan:** Karena struktur tabel dan data sudah tersedia pada file SQL, Anda **tidak perlu menjalankan** `php artisan migrate` maupun `php artisan db:seed`.
 
 ### 8. Jalankan Laravel Server
 
