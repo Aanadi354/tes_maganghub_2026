@@ -8,6 +8,8 @@ use App\Http\Requests\TransaksiRequest;
 use App\Models\Item;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class TransaksiController extends Controller
 {
@@ -38,51 +40,51 @@ class TransaksiController extends Controller
         ], 201);
     }
 
+
     public function barangKeluar(TransaksiRequest $request)
     {
         $data = $request->validated();
 
         $item = Item::findOrFail($data['item_id']);
+        $tanggal = Carbon::parse($data['tanggal_transaksi'])->toDateString();
 
-        if ($item->stock_awal < $data['jumlah']) {
+        $saldoPadaTanggal = Transaksi::where('item_id', $item->id)
+            ->whereDate('tanggal_transaksi', '<=', $tanggal)
+            ->selectRaw("
+                COALESCE(SUM(
+                    CASE
+                        WHEN jenis_transaksi = 'masuk' THEN jumlah
+                        WHEN jenis_transaksi = 'keluar' THEN -jumlah
+                        ELSE 0
+                    END
+                ), 0) as saldo
+            ")
+            ->value('saldo');
 
+        if ($saldoPadaTanggal < $data['jumlah']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok barang tidak mencukupi.'
-            ],422);
-
+                'message' => 'Stok tidak mencukupi pada tanggal keluar yang dipilih.'
+            ], 422);
         }
 
-        DB::transaction(function () use ($item,$data){
-
-            $item->decrement('stock_awal',$data['jumlah']);
+        DB::transaction(function () use ($item, $data) {
+            $item->decrement('stock_awal', $data['jumlah']);
 
             Transaksi::create([
-
-                'kode_transaksi'=>'TRX-'.now()->format('YmdHis'),
-
-                'item_id'=>$data['item_id'],
-
-                'tanggal_transaksi'=>$data['tanggal_transaksi'],
-
-                'jenis_transaksi'=>'keluar',
-
-                'jumlah'=>$data['jumlah'],
-
-                'keterangan'=>$data['keterangan'] ?? null
-
+                'kode_transaksi'    => 'TRX-' . now()->format('YmdHis'),
+                'item_id'           => $data['item_id'],
+                'tanggal_transaksi' => $data['tanggal_transaksi'],
+                'jenis_transaksi'   => 'keluar',
+                'jumlah'            => $data['jumlah'],
+                'keterangan'        => $data['keterangan'] ?? null,
             ]);
-
         });
 
         return response()->json([
-
-            'success'=>true,
-
-            'message'=>'Barang keluar berhasil disimpan.'
-
-        ],201);
-
+            'success' => true,
+            'message' => 'Barang keluar berhasil disimpan.'
+        ], 201);
     }
 
     public function laporan(Request $request)

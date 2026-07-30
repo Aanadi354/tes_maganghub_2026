@@ -1,76 +1,67 @@
 <template>
 
-<table class="table table-bordered">
+    <table class="table table-bordered">
 
-<thead class="table-dark">
+        <thead class="table-dark">
 
-<tr>
+            <tr>
 
-<th>No</th>
+                <th>No</th>
 
-<th>Kode</th>
+                <th>Kode</th>
 
-<th>Nama</th>
+                <th>Nama</th>
 
-<th>Satuan</th>
+                <th>Satuan</th>
 
-<th>Harga</th>
+                <th>Harga</th>
 
-<th>Stock</th>
+                <th>Stock Sementara</th>
 
-<th>Aksi</th>
+                <th>Aksi</th>
 
-</tr>
+            </tr>
 
-</thead>
+        </thead>
 
-<tbody>
+        <tbody>
 
-<tr
-v-for="(item,index) in items"
-:key="item.id"
->
+            <tr v-for="(item, index) in items" :key="item.id">
 
-<td>{{ index+1 }}</td>
+                <td>{{ index + 1 }}</td>
 
-<td>{{ item.kode_barang }}</td>
+                <td>{{ item.kode_barang }}</td>
 
-<td>{{ item.nama_barang }}</td>
+                <td>{{ item.nama_barang }}</td>
 
-<td>{{ item.satuan }}</td>
+                <td>{{ item.satuan }}</td>
 
-<td>{{ formatRupiah(item.harga_satuan) }}</td>
+                <td>{{ formatRupiah(item.harga_satuan) }}</td>
 
-<td>{{ item.stock_awal }}</td>
+                <td>{{ item.stock_awal }}</td>
 
-<td>
+                <td>
 
-<button
-class="btn btn-warning btn-sm me-2"
-@click="$emit('edit',item)"
->
+                    <button class="btn btn-warning btn-sm me-2" @click="$emit('edit', item)">
 
-Edit
+                        Edit
 
-</button>
+                    </button>
 
-<button
-    class="btn btn-danger btn-sm"
-    @click="() => {
-        console.log('Klik Delete', item);
-        $emit('delete', item);
-    }"
->
-    Delete
-</button>
+                    <button class="btn btn-danger btn-sm" @click="() => {
+                        console.log('Klik Delete', item);
+                        $emit('delete', item);
+                    }">
+                        Delete
+                    </button>
 
-</td>
+                </td>
 
-</tr>
+            </tr>
 
-</tbody>
+        </tbody>
 
-</table>
+    </table>
 
 </template>
 
@@ -78,27 +69,27 @@ Edit
 
 defineProps({
 
-items:Array
+    items: Array
 
 })
 
 defineEmits([
 
-"edit",
+    "edit",
 
-"delete"
+    "delete"
 
 ])
 
-const formatRupiah=(angka)=>{
+const formatRupiah = (angka) => {
 
-return new Intl.NumberFormat("id-ID",{
+    return new Intl.NumberFormat("id-ID", {
 
-style:"currency",
+        style: "currency",
 
-currency:"IDR"
+        currency: "IDR"
 
-}).format(angka)
+    }).format(angka)
 
 }
 

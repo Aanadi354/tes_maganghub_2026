@@ -67,7 +67,7 @@
 
                     <div class="mb-3">
 
-                        <label>Stock</label>
+                        <label>Stock Awal</label>
 
                         <input type="number" v-model.number="form.stock_awal" class="form-control" />
 

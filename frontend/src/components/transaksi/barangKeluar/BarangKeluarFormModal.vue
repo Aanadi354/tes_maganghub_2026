@@ -175,6 +175,14 @@ const save = async () => {
         errorMessage.value = "Jumlah barang keluar harus lebih dari 0.";
         return;
     }
+    if (!form.tanggal_transaksi) {
+        errorMessage.value = "Tanggal transaksi wajib dipilih.";
+        return;
+    }
+    if (!form.tanggal_transaksi) {
+        errorMessage.value = "Tanggal transaksi wajib dipilih.";
+        return;
+    }
 
     const selectedBarang = daftarBarang.value.find((item) => item.id === Number(form.item_id));
 
