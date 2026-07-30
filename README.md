@@ -187,6 +187,8 @@ Technical Test
 - **Tools:** Node.js, npm, Git, GitHub
 - **PDF Export:** jsPDF, jsPDF AutoTable
 
+**Struktur Database**\
+![Struktur Database](docs/images/struktur_database.png)
 
 
 ## 📫 Contact
